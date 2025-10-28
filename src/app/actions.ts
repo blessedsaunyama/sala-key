@@ -1,104 +1,105 @@
 'use server';
 
 import { z } from 'zod';
-import { vigenereCipher, caesarCipher, atbashCipher } from '@/lib/cipher';
+import CryptoJS from 'crypto-js';
 
 const cipherSchema = z.object({
+  type: z.literal('cipher'),
   text: z.string().min(1, { message: 'Input text cannot be empty.' }),
-  cipher: z.enum(['vigenere', 'caesar', 'atbash']),
-  key: z.string().optional(),
-  shift: z.coerce.number().optional(),
-  direction: z.enum(['encrypt', 'decrypt']).optional().default('encrypt'),
-}).superRefine((data, ctx) => {
-    switch (data.cipher) {
-        case 'vigenere':
-            if (typeof data.key !== 'string' || data.key.length === 0) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Vigenère cipher requires a key.',
-                    path: ['key'],
-                });
-            } else if (!/^[a-zA-Z]+$/.test(data.key)) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Key must only contain alphabetic characters.',
-                    path: ['key'],
-                });
-            }
-            break;
-        case 'caesar':
-            if (typeof data.shift !== 'number') {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Caesar cipher requires a shift value.',
-                    path: ['shift'],
-                });
-            }
-            break;
-        case 'atbash':
-            // No specific validation needed for atbash
-            break;
-    }
+  algorithm: z.enum(['aes']),
+  key: z.string().min(1, { message: 'A key is required for encryption.' }),
+  direction: z.enum(['encrypt', 'decrypt']),
 });
+
+const hashSchema = z.object({
+  type: z.literal('hash'),
+  text: z.string().min(1, { message: 'Input text cannot be empty.' }),
+  algorithm: z.enum(['md5', 'sha1', 'sha256', 'sha512', 'sha3', 'ripemd160']),
+});
+
+const combinedSchema = z.union([cipherSchema, hashSchema]);
 
 export type State = {
   message?: string | null;
   result?: string | null;
-  issues?: Partial<Record<'text' | 'key' | 'shift' | '_form', string[] | undefined>>;
+  issues?: Partial<Record<'text' | 'key' | '_form', string[] | undefined>>;
 };
 
 export async function handleCipher(
   prevState: State,
   formData: FormData
 ): Promise<State> {
-  const cipher = formData.get('cipher') as 'vigenere' | 'caesar' | 'atbash';
+  const formType = formData.get('type') as 'cipher' | 'hash';
 
   const dataToValidate: { [key: string]: any } = {
+    type: formType,
     text: formData.get('text'),
-    cipher: cipher,
-    direction: formData.get('direction') || 'encrypt',
+    algorithm: formData.get('algorithm'),
   };
 
-  if (formData.has('key')) {
+  if (formType === 'cipher') {
     dataToValidate.key = formData.get('key');
-  }
-  if (formData.has('shift')) {
-    dataToValidate.shift = formData.get('shift');
-  }
-  if (cipher === 'atbash') {
-    dataToValidate.direction = 'encrypt';
+    dataToValidate.direction = formData.get('direction');
   }
 
-
-  const validatedFields = cipherSchema.safeParse(dataToValidate);
+  const validatedFields = combinedSchema.safeParse(dataToValidate);
 
   if (!validatedFields.success) {
-    const fieldErrors = validatedFields.error.flatten().fieldErrors;
+    const fieldErrors = validatedFields.error.flatten().fieldErrors as State['issues'];
     return {
       issues: fieldErrors,
       message: "There were errors with your submission. Please check the fields.",
     };
   }
 
-  const { text, cipher: validatedCipher, key, shift, direction } = validatedFields.data;
-
   // Simulate processing time
   await new Promise((resolve) => setTimeout(resolve, 500));
 
+  const { data } = validatedFields;
   let result = '';
-  switch (validatedCipher) {
-    case 'vigenere':
-      // The superRefine check ensures the key is present and valid
-      result = vigenereCipher(text, key!, direction);
-      break;
-    case 'caesar':
-       // The superRefine check ensures the shift is present
-      result = caesarCipher(text, shift!, direction);
-      break;
-    case 'atbash':
-      result = atbashCipher(text);
-      break;
+
+  try {
+    if (data.type === 'hash') {
+        const { text, algorithm } = data;
+        switch (algorithm) {
+            case 'md5':
+                result = CryptoJS.MD5(text).toString();
+                break;
+            case 'sha1':
+                result = CryptoJS.SHA1(text).toString();
+                break;
+            case 'sha256':
+                result = CryptoJS.SHA256(text).toString();
+                break;
+            case 'sha512':
+                result = CryptoJS.SHA512(text).toString();
+                break;
+            case 'sha3':
+                result = CryptoJS.SHA3(text).toString();
+                break;
+            case 'ripemd160':
+                result = CryptoJS.RIPEMD160(text).toString();
+                break;
+        }
+    } else if (data.type === 'cipher') {
+        const { text, algorithm, key, direction } = data;
+        if (algorithm === 'aes') {
+            if (direction === 'encrypt') {
+                result = CryptoJS.AES.encrypt(text, key).toString();
+            } else {
+                const bytes  = CryptoJS.AES.decrypt(text, key);
+                result = bytes.toString(CryptoJS.enc.Utf8);
+                if (!result) {
+                    return { message: "Decryption failed. Please check your input text and key." };
+                }
+            }
+        }
+    }
+  } catch (error) {
+      console.error(error);
+      return { message: "An unexpected error occurred during the cryptographic operation." };
   }
+
 
   return { result };
 }

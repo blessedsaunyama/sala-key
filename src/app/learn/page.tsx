@@ -6,7 +6,6 @@ import {
 } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight } from 'lucide-react';
 
 export default function LearnPage() {
   return (
@@ -14,84 +13,63 @@ export default function LearnPage() {
       <div className="max-w-4xl mx-auto space-y-10">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl font-headline">
-            Learn About Ciphers
+            Learn About Modern Cryptography
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Explore the history and mechanics of classical encryption methods.
+            Explore the concepts behind modern hashing and encryption algorithms.
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Classical Ciphers</CardTitle>
+            <CardTitle>Core Concepts</CardTitle>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="vigenere">
-                <AccordionTrigger>Vigenère Cipher</AccordionTrigger>
+              <AccordionItem value="hashing">
+                <AccordionTrigger>Cryptographic Hashing</AccordionTrigger>
                 <AccordionContent className="space-y-4">
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Polyalphabetic</Badge>
-                    <Badge variant="secondary">Keyword-based</Badge>
+                    <Badge variant="secondary">One-Way Function</Badge>
+                    <Badge variant="secondary">Fixed-Size Output</Badge>
+                    <Badge variant="secondary">Collision Resistant</Badge>
                   </div>
                   <p>
-                    The Vigenère cipher is a method of encrypting alphabetic text by using a simple form of polyalphabetic substitution. It uses a keyword to shift each letter of the plaintext by a different amount. For example, if the keyword is `SECRET` and the plaintext is `HELLO`, the first letter `H` is shifted by `S` (18 positions), the second `E` is shifted by `E` (4 positions), and so on.
+                    A cryptographic hash function is a one-way function that takes an input of any size and produces a fixed-size string of bytes, called a hash. The process is deterministic, meaning the same input will always produce the same output. It's computationally infeasible to reverse the process (i.e., find the input from the hash).
+                  </p>
+                  <p>
+                    Good hash functions are also designed to be <strong className="text-foreground">collision-resistant</strong>, meaning it's extremely difficult to find two different inputs that produce the same hash. Hash functions are fundamental to data integrity, password storage, and blockchains.
                   </p>
                   <div className="p-4 bg-muted/50 rounded-md font-code text-sm">
-                    <p>HELLO + SECRET</p>
-                    <p>H (7) + S (18) = Z (25)</p>
-                    <p>E (4) + E (4) = I (8)</p>
-                    <p>L (11) + C (2) = N (13)</p>
-                    <p>L (11) + R (17) = C (2)</p>
-                    <p>O (14) + E (4) = S (18)</p>
-                    <div className="flex items-center gap-2 mt-2">
-                        <span className="font-bold">Result:</span>
-                        <span>ZINCS</span>
-                    </div>
+                    <p className="font-bold text-foreground">Example (SHA-256):</p>
+                    <p>Input: "Hello World"</p>
+                    <p className="mt-2 break-all">Output: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e</p>
                   </div>
-                  <p>
-                    Considered unbreakable for centuries, its weakness is the repeating nature of its keyword, which can be exploited with frequency analysis.
-                  </p>
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="caesar">
-                <AccordionTrigger>Caesar Cipher</AccordionTrigger>
+              <AccordionItem value="symmetric-encryption">
+                <AccordionTrigger>Symmetric Encryption (AES)</AccordionTrigger>
                 <AccordionContent className="space-y-4">
                     <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">Monoalphabetic</Badge>
-                        <Badge variant="secondary">Substitution</Badge>
+                        <Badge variant="secondary">Shared Secret Key</Badge>
+                        <Badge variant="secondary">Block Cipher</Badge>
+                        <Badge variant="secondary">AES</Badge>
                     </div>
                     <p>
-                        The Caesar cipher is one of the simplest and most widely known encryption techniques. It is a type of substitution cipher in which each letter in the plaintext is replaced by a letter some fixed number of positions down the alphabet. For example, with a left shift of 3, `D` would be replaced by `A`, `E` would become `B`, and so on.
+                        Symmetric encryption uses a single, shared secret key to both encrypt and decrypt data. Both the sender and the receiver must have access to the same key. It is very fast and efficient for encrypting large amounts of data.
                     </p>
-                    <div className="p-4 bg-muted/50 rounded-md font-code text-sm flex items-center gap-2">
-                        <span>HELLO</span>
-                        <ArrowRight className="w-4 h-4" />
-                        <span className="font-bold">EBIIL</span>
-                        <span className="text-muted-foreground">(Shift of -3)</span>
-                    </div>
                     <p>
-                        The method is named after Julius Caesar, who used it in his private correspondence. Its weakness is that it's trivial to break with frequency analysis, as every letter is always mapped to the same other letter.
+                       The <strong className="text-foreground">Advanced Encryption Standard (AES)</strong> is the most widely used symmetric algorithm today. It is a block cipher, meaning it operates on fixed-size blocks of data (128 bits for AES). It is considered highly secure and is used by governments and corporations worldwide.
                     </p>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="atbash">
-                <AccordionTrigger>Atbash Cipher</AccordionTrigger>
-                <AccordionContent className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">Monoalphabetic</Badge>
-                        <Badge variant="secondary">Substitution</Badge>
+                    <div className="p-4 bg-muted/50 rounded-md font-code text-sm">
+                        <p className="font-bold text-foreground">Example (AES):</p>
+                        <p>Plaintext: "Message"</p>
+                        <p>Key: "Secret Passphrase"</p>
+                        <p className="mt-2 break-all">Ciphertext (Base64): U2FsdGVkX1... (output varies due to salt)</p>
+                        <p className="mt-2">To decrypt, you need the exact same key: "Secret Passphrase".</p>
                     </div>
                     <p>
-                        The Atbash cipher is a simple substitution cipher originally used for the Hebrew alphabet. It works by substituting each letter with its reverse in the alphabet; for example, `A` becomes `Z`, `B` becomes `Y`, and so on. It requires no key.
-                    </p>
-                    <div className="p-4 bg-muted/50 rounded-md font-code text-sm flex items-center gap-2">
-                        <span>HELLO</span>
-                        <ArrowRight className="w-4 h-4" />
-                        <span className="font-bold">SVOOL</span>
-                    </div>
-                    <p>
-                        Because it is a fixed, keyless substitution, it offers virtually no security and is easily broken. It is more of a historical curiosity than a practical cipher.
+                        The main challenge with symmetric encryption is securely sharing the secret key between parties.
                     </p>
                 </AccordionContent>
               </AccordionItem>
