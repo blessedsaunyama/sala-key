@@ -83,6 +83,31 @@ export default function LearnPage() {
                     </p>
                 </AccordionContent>
               </AccordionItem>
+               <AccordionItem value="vigenere-cipher">
+                <AccordionTrigger>Classical Encryption (Vigenère)</AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">Polyalphabetic</Badge>
+                        <Badge variant="secondary">Keyword-based</Badge>
+                    </div>
+                    <p>
+                        The Vigenère cipher is a classic method of encrypting alphabetic text by using a simple form of polyalphabetic substitution. A polyalphabetic cipher is any cipher based on substitution, using multiple substitution alphabets.
+                    </p>
+                    <p>
+                        It uses a keyword to shift each letter of the plaintext by a different amount. For example, with a keyword "KEY", the first letter of the plaintext is shifted by 'K' (10 positions), the second by 'E' (4 positions), the third by 'Y' (24 positions), the fourth by 'K' again, and so on.
+                    </p>
+                    <div className="p-4 bg-muted/50 rounded-md font-code text-sm">
+                        <p className="font-bold text-foreground">Example (Vigenère):</p>
+                        <p>Plaintext: "ATTACKATDAWN"</p>
+                        <p>Key: "LEMON"</p>
+                        <p className="mt-2 break-all">Ciphertext: "LXFOPVEFRNHR"</p>
+                        <p className="mt-2">The first 'A' is shifted by 'L' (11), so it becomes 'L'. The 'T' is shifted by 'E' (4), so it becomes 'X', and so on.</p>
+                    </div>
+                    <p>
+                        For centuries, it was believed to be unbreakable, earning it the name <strong className="text-foreground">le chiffrage indéchiffrable</strong> ("the indecipherable cipher"). Its primary weakness is the repeating nature of its key, which can be exploited with frequency analysis, a technique you can try on the "Analysis" page.
+                    </p>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </CardContent>
         </Card>

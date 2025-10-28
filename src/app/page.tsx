@@ -9,7 +9,7 @@ export default function Home() {
             CipherSafe
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            A modern tool to encrypt and decrypt messages using the classic Vigenère cipher. All operations are securely processed on the server, ensuring your data remains private.
+            A modern tool to explore hashing, modern encryption like AES, and classic ciphers. All operations are securely processed on the server.
           </p>
         </div>
         <CipherForm />

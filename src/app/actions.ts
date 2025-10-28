@@ -3,10 +3,49 @@
 import { z } from 'zod';
 import CryptoJS from 'crypto-js';
 
+// Vigenère cipher implementation
+function vigenere(text: string, key: string, decrypt: boolean): string {
+    let result = '';
+    const keyLength = key.length;
+    for (let i = 0; i < text.length; i++) {
+        const charCode = text.charCodeAt(i);
+        // Handle uppercase letters
+        if (charCode >= 65 && charCode <= 90) {
+            const keyChar = key[(i % keyLength)].toUpperCase().charCodeAt(0);
+            const shift = keyChar - 65;
+            let newCharCode;
+            if (decrypt) {
+                newCharCode = ((charCode - 65 - shift + 26) % 26) + 65;
+            } else {
+                newCharCode = ((charCode - 65 + shift) % 26) + 65;
+            }
+            result += String.fromCharCode(newCharCode);
+        } 
+        // Handle lowercase letters
+        else if (charCode >= 97 && charCode <= 122) {
+            const keyChar = key[(i % keyLength)].toLowerCase().charCodeAt(0);
+            const shift = keyChar - 97;
+            let newCharCode;
+            if (decrypt) {
+                newCharCode = ((charCode - 97 - shift + 26) % 26) + 97;
+            } else {
+                newCharCode = ((charCode - 97 + shift) % 26) + 97;
+            }
+            result += String.fromCharCode(newCharCode);
+        }
+        // Non-alphabetic characters remain unchanged
+        else {
+            result += text.charAt(i);
+        }
+    }
+    return result;
+}
+
+
 const cipherSchema = z.object({
   type: z.literal('cipher'),
   text: z.string().min(1, { message: 'Input text cannot be empty.' }),
-  algorithm: z.enum(['aes']),
+  algorithm: z.enum(['aes', 'vigenere']),
   key: z.string().min(1, { message: 'A key is required for encryption.' }),
   direction: z.enum(['encrypt', 'decrypt']),
 });
@@ -93,6 +132,8 @@ export async function handleCipher(
                     return { message: "Decryption failed. Please check your input text and key." };
                 }
             }
+        } else if (algorithm === 'vigenere') {
+            result = vigenere(text, key, direction === 'decrypt');
         }
     }
   } catch (error) {

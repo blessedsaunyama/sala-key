@@ -99,6 +99,7 @@ export default function CipherForm() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="aes">AES</SelectItem>
+                                <SelectItem value="vigenere">Vigenère</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

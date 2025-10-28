@@ -47,9 +47,9 @@ export default function AnalysisPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Analysis Tool</CardTitle>
+            <CardTitle>Ciphertext Analysis Tool</CardTitle>
             <CardDescription>
-              Paste your ciphertext below to see a live analysis of its letter frequency.
+              Paste your ciphertext below to see a live analysis of its letter frequency. This is a classic technique for breaking substitution ciphers.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -97,7 +97,7 @@ export default function AnalysisPage() {
                     The Vigenère cipher was considered unbreakable for centuries, earning it the nickname <strong className="text-foreground">le chiffrage indéchiffrable</strong> ("the indecipherable cipher"). Its strength comes from using a keyword to shift letters, creating multiple cipher alphabets.
                 </p>
                 <p>
-                    However, it has a critical weakness: the repeating nature of the key. If a key is short, patterns emerge in the ciphertext. This bar chart visualizes letter frequency. In a perfectly secure cipher, every letter would appear with roughly equal frequency, resulting in a "flat" chart.
+                    However, it has a critical weakness: the repeating nature of the key. If a key is short, patterns emerge in the ciphertext. This bar chart visualizes letter frequency. In a perfectly secure modern cipher, every letter would appear with roughly equal frequency, resulting in a "flat" chart.
                 </p>
                 <p>
                     With Vigenère, you'll notice peaks and valleys similar to natural language, just distributed differently. This non-flat distribution is the foothold cryptanalysts like Charles Babbage and Friedrich Kasiski used to break it. By finding repeated sequences in the ciphertext, they could deduce the key's length and then perform frequency analysis on each alphabet separately, effectively reducing the problem to breaking multiple simple Caesar ciphers.
