@@ -9,30 +9,36 @@ const cipherSchema = z.object({
   key: z.string().optional(),
   shift: z.coerce.number().optional(),
   direction: z.enum(['encrypt', 'decrypt']).optional().default('encrypt'),
-}).refine(data => {
-  if (data.cipher === 'vigenere') {
-    return typeof data.key === 'string' && data.key.length > 0;
-  }
-  return true;
-}, {
-    message: 'Vigenère cipher requires a key.',
-    path: ['key'],
-}).refine(data => {
-    if (data.cipher === 'vigenere' && data.key) {
-        return /^[a-zA-Z]+$/.test(data.key);
+}).superRefine((data, ctx) => {
+    switch (data.cipher) {
+        case 'vigenere':
+            if (typeof data.key !== 'string' || data.key.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Vigenère cipher requires a key.',
+                    path: ['key'],
+                });
+            } else if (!/^[a-zA-Z]+$/.test(data.key)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Key must only contain alphabetic characters.',
+                    path: ['key'],
+                });
+            }
+            break;
+        case 'caesar':
+            if (typeof data.shift !== 'number') {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Caesar cipher requires a shift value.',
+                    path: ['shift'],
+                });
+            }
+            break;
+        case 'atbash':
+            // No specific validation needed for atbash
+            break;
     }
-    return true;
-}, {
-    message: 'Key must only contain alphabetic characters.',
-    path: ['key'],
-}).refine(data => {
-    if (data.cipher === 'caesar') {
-        return typeof data.shift === 'number';
-    }
-    return true;
-}, {
-    message: 'Caesar cipher requires a shift value.',
-    path: ['shift'],
 });
 
 export type State = {
@@ -82,11 +88,11 @@ export async function handleCipher(
   let result = '';
   switch (validatedCipher) {
     case 'vigenere':
-      // The refine check ensures the key is present and valid
+      // The superRefine check ensures the key is present and valid
       result = vigenereCipher(text, key!, direction);
       break;
     case 'caesar':
-       // The refine check ensures the shift is present
+       // The superRefine check ensures the shift is present
       result = caesarCipher(text, shift!, direction);
       break;
     case 'atbash':
