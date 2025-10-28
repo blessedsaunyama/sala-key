@@ -4,3 +4,6 @@ Allow: /
 
 # Host
 Host: https://ciphersafe.saunyamabt.dev
+
+# Sitemaps
+Sitemap: https://ciphersafe.saunyamabt.dev/sitemap.xml
