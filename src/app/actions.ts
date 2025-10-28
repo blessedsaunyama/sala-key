@@ -1,20 +1,29 @@
 'use server';
 
 import { z } from 'zod';
-import { vigenereCipher } from '@/lib/cipher';
+import { vigenereCipher, caesarCipher, atbashCipher } from '@/lib/cipher';
 
 const cipherSchema = z.object({
   text: z.string().min(1, { message: 'Input text cannot be empty.' }),
-  key: z.string()
-    .min(1, { message: 'Cipher key cannot be empty.' })
-    .regex(/^[a-zA-Z]+$/, { message: 'Key must only contain alphabetic characters.' }),
+  cipher: z.enum(['vigenere', 'caesar', 'atbash']),
+  key: z.string().optional(),
+  shift: z.coerce.number().optional(),
   direction: z.enum(['encrypt', 'decrypt']),
+}).refine(data => data.cipher !== 'vigenere' || (typeof data.key === 'string' && data.key.length > 0), {
+    message: 'Vigenère cipher requires a key.',
+    path: ['key'],
+}).refine(data => data.cipher !== 'vigenere' || /^[a-zA-Z]+$/.test(data.key ?? ''), {
+    message: 'Key must only contain alphabetic characters.',
+    path: ['key'],
+}).refine(data => data.cipher !== 'caesar' || (typeof data.shift === 'number'), {
+    message: 'Caesar cipher requires a shift value.',
+    path: ['shift'],
 });
 
 export type State = {
   message?: string | null;
   result?: string | null;
-  issues?: string[];
+  issues?: Partial<Record<'text' | 'key' | 'shift' | '_form', string[] | undefined>>;
 };
 
 export async function handleCipher(
@@ -23,23 +32,37 @@ export async function handleCipher(
 ): Promise<State> {
   const validatedFields = cipherSchema.safeParse({
     text: formData.get('text'),
+    cipher: formData.get('cipher'),
     key: formData.get('key'),
+    shift: formData.get('shift'),
     direction: formData.get('direction'),
   });
 
   if (!validatedFields.success) {
+    const fieldErrors = validatedFields.error.flatten().fieldErrors;
     return {
-      issues: validatedFields.error.flatten().fieldErrors.key,
-      message: validatedFields.error.flatten().fieldErrors.text?.[0],
+      issues: fieldErrors,
+      message: "There were errors with your submission. Please check the fields.",
     };
   }
 
-  const { text, key, direction } = validatedFields.data;
+  const { text, cipher, key, shift, direction } = validatedFields.data;
 
   // Simulate processing time
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  const result = vigenereCipher(text, key, direction);
+  let result = '';
+  switch (cipher) {
+    case 'vigenere':
+      result = vigenereCipher(text, key!, direction);
+      break;
+    case 'caesar':
+      result = caesarCipher(text, shift!, direction);
+      break;
+    case 'atbash':
+      result = atbashCipher(text);
+      break;
+  }
 
   return { result };
 }

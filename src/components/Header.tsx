@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Lock } from 'lucide-react';
+import { Lock, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 
@@ -22,6 +22,12 @@ export function Header() {
           <Button variant="ghost" asChild>
             <Link href="/analysis" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               Analysis
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link href="/learn" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+              <BookOpen className="w-4 h-4" />
+              Learn
             </Link>
           </Button>
         </div>

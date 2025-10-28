@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
 import { handleCipher, type State } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,35 +31,44 @@ function SubmitButton() {
   );
 }
 
+type CipherType = 'vigenere' | 'caesar' | 'atbash';
+
 export default function CipherForm() {
-  const initialState: State = { message: null, issues: [], result: null };
+  const initialState: State = { message: null, issues: {}, result: null };
   const [state, formAction] = useActionState(handleCipher, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const outputRef = useRef<HTMLTextAreaElement>(null);
+  const [selectedCipher, setSelectedCipher] = useState<CipherType>('vigenere');
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (state.message) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Input",
-        description: state.message,
-      });
+    if (state.message && (state.issues?.text || state.issues?.key || state.issues?.shift || state.issues?._form)) {
+        const description = [
+          ...(state.issues.text || []),
+          ...(state.issues.key || []),
+          ...(state.issues.shift || []),
+          ...(state.issues._form || []),
+        ].join(' ');
+        
+        toast({
+            variant: "destructive",
+            title: "Invalid Input",
+            description: description || state.message,
+        });
     }
-    if (state.issues && state.issues.length > 0) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Key",
-        description: state.issues.join(' '),
-      });
-    }
-    if(state.result) {
-        if(outputRef.current) {
-            outputRef.current.value = state.result;
-        }
+    if (state.result) {
+      if (outputRef.current) {
+        outputRef.current.value = state.result;
+      }
     }
   }, [state, toast]);
 
+  const onFormAction = (formData: FormData) => {
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
 
   return (
     <Card className="w-full">
@@ -66,7 +76,7 @@ export default function CipherForm() {
         <CardTitle>Cipher Engine</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} action={formAction} className="space-y-6">
+        <form ref={formRef} action={onFormAction} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="text">Input Text</Label>
@@ -90,17 +100,52 @@ export default function CipherForm() {
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="key">Cipher Key</Label>
-            <Input
-              id="key"
-              name="key"
-              placeholder="e.g., SECRET"
-              className="font-code"
-              required
-            />
-          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="cipher">Cipher</Label>
+                <Select name="cipher" defaultValue="vigenere" onValueChange={(value: CipherType) => setSelectedCipher(value)}>
+                    <SelectTrigger id="cipher">
+                        <SelectValue placeholder="Select a cipher" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="vigenere">Vigenère Cipher</SelectItem>
+                        <SelectItem value="caesar">Caesar Cipher</SelectItem>
+                        <SelectItem value="atbash">Atbash Cipher</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="relative min-h-[68px]">
+                <AnimatePresence mode="wait">
+                    {selectedCipher === 'vigenere' && (
+                        <motion.div
+                            key="vigenere-key"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className="space-y-2 absolute w-full"
+                        >
+                            <Label htmlFor="key">Cipher Key</Label>
+                            <Input id="key" name="key" placeholder="e.g., SECRET" className="font-code" />
+                        </motion.div>
+                    )}
+                    {selectedCipher === 'caesar' && (
+                        <motion.div
+                            key="caesar-shift"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className="space-y-2 absolute w-full"
+                        >
+                            <Label htmlFor="shift">Shift</Label>
+                            <Input id="shift" name="shift" type="number" placeholder="e.g., 3" defaultValue="3" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
 
           <div className="space-y-3">
             <Label>Direction</Label>
@@ -115,7 +160,7 @@ export default function CipherForm() {
               </div>
             </RadioGroup>
           </div>
-          
+
           <SubmitButton />
         </form>
       </CardContent>
