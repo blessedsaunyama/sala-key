@@ -18,8 +18,8 @@ const cipherSchema = z.object({
     message: 'Vigenère cipher requires a key.',
     path: ['key'],
 }).refine(data => {
-    if (data.cipher === 'vigenere') {
-        return /^[a-zA-Z]+$/.test(data.key ?? '');
+    if (data.cipher === 'vigenere' && data.key) {
+        return /^[a-zA-Z]+$/.test(data.key);
     }
     return true;
 }, {
@@ -45,15 +45,26 @@ export async function handleCipher(
   prevState: State,
   formData: FormData
 ): Promise<State> {
-  const cipher = formData.get('cipher');
+  const cipher = formData.get('cipher') as 'vigenere' | 'caesar' | 'atbash';
 
-  const validatedFields = cipherSchema.safeParse({
+  const dataToValidate: { [key: string]: any } = {
     text: formData.get('text'),
     cipher: cipher,
-    key: formData.get('key'),
-    shift: formData.get('shift'),
-    direction: cipher === 'atbash' ? 'encrypt' : formData.get('direction'),
-  });
+    direction: formData.get('direction') || 'encrypt',
+  };
+
+  if (formData.has('key')) {
+    dataToValidate.key = formData.get('key');
+  }
+  if (formData.has('shift')) {
+    dataToValidate.shift = formData.get('shift');
+  }
+  if (cipher === 'atbash') {
+    dataToValidate.direction = 'encrypt';
+  }
+
+
+  const validatedFields = cipherSchema.safeParse(dataToValidate);
 
   if (!validatedFields.success) {
     const fieldErrors = validatedFields.error.flatten().fieldErrors;
@@ -71,9 +82,11 @@ export async function handleCipher(
   let result = '';
   switch (validatedCipher) {
     case 'vigenere':
+      // The refine check ensures the key is present and valid
       result = vigenereCipher(text, key!, direction);
       break;
     case 'caesar':
+       // The refine check ensures the shift is present
       result = caesarCipher(text, shift!, direction);
       break;
     case 'atbash':
