@@ -8,7 +8,7 @@ const cipherSchema = z.object({
   cipher: z.enum(['vigenere', 'caesar', 'atbash']),
   key: z.string().optional(),
   shift: z.coerce.number().optional(),
-  direction: z.enum(['encrypt', 'decrypt']),
+  direction: z.enum(['encrypt', 'decrypt']).optional().default('encrypt'),
 }).refine(data => {
   if (data.cipher === 'vigenere') {
     return typeof data.key === 'string' && data.key.length > 0;
@@ -45,12 +45,14 @@ export async function handleCipher(
   prevState: State,
   formData: FormData
 ): Promise<State> {
+  const cipher = formData.get('cipher');
+
   const validatedFields = cipherSchema.safeParse({
     text: formData.get('text'),
-    cipher: formData.get('cipher'),
+    cipher: cipher,
     key: formData.get('key'),
     shift: formData.get('shift'),
-    direction: formData.get('direction'),
+    direction: cipher === 'atbash' ? 'encrypt' : formData.get('direction'),
   });
 
   if (!validatedFields.success) {
@@ -61,13 +63,13 @@ export async function handleCipher(
     };
   }
 
-  const { text, cipher, key, shift, direction } = validatedFields.data;
+  const { text, cipher: validatedCipher, key, shift, direction } = validatedFields.data;
 
   // Simulate processing time
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   let result = '';
-  switch (cipher) {
+  switch (validatedCipher) {
     case 'vigenere':
       result = vigenereCipher(text, key!, direction);
       break;
