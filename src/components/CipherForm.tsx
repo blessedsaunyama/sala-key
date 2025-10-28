@@ -146,20 +146,31 @@ export default function CipherForm() {
                 </AnimatePresence>
             </div>
         </div>
+          <AnimatePresence>
+            {selectedCipher !== 'atbash' && (
+                <motion.div
+                    key="direction-controls"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-3 overflow-hidden"
+                >
+                    <Label>Direction</Label>
+                    <RadioGroup defaultValue="encrypt" name="direction" className="flex gap-4">
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="encrypt" id="encrypt" />
+                            <Label htmlFor="encrypt">Encrypt</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="decrypt" id="decrypt" />
+                            <Label htmlFor="decrypt">Decrypt</Label>
+                        </div>
+                    </RadioGroup>
+                </motion.div>
+            )}
+          </AnimatePresence>
 
-          <div className="space-y-3">
-            <Label>Direction</Label>
-            <RadioGroup defaultValue="encrypt" name="direction" className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="encrypt" id="encrypt" />
-                <Label htmlFor="encrypt">Encrypt</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="decrypt" id="decrypt" />
-                <Label htmlFor="decrypt">Decrypt</Label>
-              </div>
-            </RadioGroup>
-          </div>
 
           <SubmitButton />
         </form>

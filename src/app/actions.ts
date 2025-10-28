@@ -9,13 +9,28 @@ const cipherSchema = z.object({
   key: z.string().optional(),
   shift: z.coerce.number().optional(),
   direction: z.enum(['encrypt', 'decrypt']),
-}).refine(data => data.cipher !== 'vigenere' || (typeof data.key === 'string' && data.key.length > 0), {
+}).refine(data => {
+  if (data.cipher === 'vigenere') {
+    return typeof data.key === 'string' && data.key.length > 0;
+  }
+  return true;
+}, {
     message: 'Vigenère cipher requires a key.',
     path: ['key'],
-}).refine(data => data.cipher !== 'vigenere' || /^[a-zA-Z]+$/.test(data.key ?? ''), {
+}).refine(data => {
+    if (data.cipher === 'vigenere') {
+        return /^[a-zA-Z]+$/.test(data.key ?? '');
+    }
+    return true;
+}, {
     message: 'Key must only contain alphabetic characters.',
     path: ['key'],
-}).refine(data => data.cipher !== 'caesar' || (typeof data.shift === 'number'), {
+}).refine(data => {
+    if (data.cipher === 'caesar') {
+        return typeof data.shift === 'number';
+    }
+    return true;
+}, {
     message: 'Caesar cipher requires a shift value.',
     path: ['shift'],
 });
