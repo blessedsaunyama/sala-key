@@ -7,9 +7,9 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'CipherSafe | Modern & Classic Cryptography Tool',
-  description: 'A modern tool to explore hashing (MD5, SHA-256), modern encryption like AES, and classic ciphers like the Vigenère cipher. Encrypt, decrypt, hash, and learn about cryptography.',
-  keywords: ['cryptography', 'encryption', 'decryption', 'hashing', 'AES', 'SHA-256', 'SHA-512', 'MD5', 'Vigenère cipher', 'Atbash cipher', 'Caesar cipher', 'cipher', 'hash', 'security', 'privacy', 'cryptography tool', 'cybersecurity'],
+  title: 'SalaKey | Modern & Classic Cryptography Tool',
+  description: 'A modern tool to explore hashing (MD5, SHA-256), modern encryption like AES, and classic ciphers. "Sala" is Finnish for secret. Encrypt, decrypt, hash, and learn about cryptography.',
+  keywords: ['salakey', 'secret key', 'cryptography', 'encryption', 'decryption', 'hashing', 'AES', 'SHA-256', 'SHA-512', 'MD5', 'Vigenère cipher', 'cipher', 'hash', 'security', 'privacy', 'cryptography tool', 'cybersecurity', 'finnish', 'sala'],
 };
 
 export default function RootLayout({

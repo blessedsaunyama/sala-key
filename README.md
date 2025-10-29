@@ -1,6 +1,6 @@
-# CipherSafe: A Modern Cryptography Tool
+# SalaKey: A Modern Cryptography Tool
 
-CipherSafe is a web application built with Next.js that provides a user-friendly interface for exploring modern cryptographic algorithms. Users can encrypt, decrypt, and hash text using various standard methods, and learn about the underlying principles of cryptography.
+SalaKey is a web application built with Next.js that provides a user-friendly interface for exploring modern cryptographic algorithms. "Sala" is Finnish for "secret" or "hidden", reflecting the app's purpose. Users can encrypt, decrypt, and hash text using various standard methods, and learn about the underlying principles of cryptography.
 
 ## Features
 
@@ -32,12 +32,12 @@ To run this project locally, you'll need Node.js and npm installed.
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/blessedsaunyama/cipher-safe.git
     ```
 
 2.  **Navigate to the project directory:**
     ```bash
-    cd <project-directory>
+    cd cipher-safe
     ```
 
 3.  **Install dependencies:**

@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: 'https://ciphersafe.saunyamabt.dev',
+  siteUrl: 'https://salakey.saunyamabt.dev',
   generateRobotsTxt: true, 
   generateIndexSitemap: false,
 };

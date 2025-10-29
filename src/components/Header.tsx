@@ -47,7 +47,7 @@ export function Header() {
           <div className="bg-primary text-primary-foreground p-2 rounded-md">
             <Lock className="w-5 h-5" />
           </div>
-          <span className="hidden sm:inline font-headline">CipherSafe</span>
+          <span className="hidden sm:inline font-headline">SalaKey</span>
         </Link>
         <div className="flex items-center gap-2 sm:gap-4">
           <Button variant="ghost" asChild>

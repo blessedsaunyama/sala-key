@@ -6,7 +6,7 @@ export default function Home() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl font-headline">
-            CipherSafe
+            SalaKey
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
             A modern tool to explore hashing, modern encryption like AES, and classic ciphers. All operations are securely processed on the server.
